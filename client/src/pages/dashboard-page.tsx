@@ -52,6 +52,7 @@ function DashboardPage() {
   const [newIdea, setNewIdea] = useState("");
   const [newTeamSize, setNewTeamSize] = useState("");
   const [newTimeframe, setNewTimeframe] = useState("");
+  const [devSkills, setDevSkills] = useState(""); // NEW – skills tímu
 
   const [draftBrief, setDraftBrief] = useState("");
   const [briefError, setBriefError] = useState<string | null>(null);
@@ -111,6 +112,8 @@ function DashboardPage() {
         idea: newIdea,
         teamSize: newTeamSize,
         timeframe: newTimeframe,
+        // voliteľné: ak si rozšíril backend aj draft-brief o devSkills, môžeš pridať:
+        // devSkills,
       });
 
       setDraftBrief(data.brief || "");
@@ -120,7 +123,7 @@ function DashboardPage() {
     }
   };
 
-  // vytvorí projekt cez backend orchestrátora (DB + AI agents)
+  // vytvorí projekt cez backend orchestrátora (DB + AI agents + architecture + tech stack)
   const handleCreateProject = async () => {
     if (!newName.trim() || !draftBrief.trim()) {
       return;
@@ -133,6 +136,7 @@ function DashboardPage() {
         brief: draftBrief,
         teamSize: newTeamSize,
         timeframe: newTimeframe,
+        devSkills: devSkills.trim() || undefined, // NEW – pošleme skills agentom
       });
 
       // reset + zavrieť modal
@@ -141,6 +145,7 @@ function DashboardPage() {
       setNewIdea("");
       setNewTeamSize("");
       setNewTimeframe("");
+      setDevSkills("");
       setDraftBrief("");
       setBriefError(null);
 
@@ -184,8 +189,8 @@ function DashboardPage() {
               Projects
             </h1>
             <p className="mt-1 text-sm text-neutral-400 sm:text-base">
-              Overview of all orchestrator workspaces. Pick a project or create
-              a new one to let the agents plan for you.
+              Overview of all orchestrator workspaces. Agents will plan phases,
+              tasks, architecture and recommend a tech stack for each project.
             </p>
           </div>
 
@@ -321,7 +326,9 @@ function DashboardPage() {
                   <span>
                     Created: {new Date(project.createdAt).toLocaleDateString()}
                   </span>
-                  <span className="text-emerald-300">Open project →</span>
+                  <span className="text-emerald-300">
+                    Open project →
+                  </span>
                 </div>
               </button>
             ))}
@@ -339,21 +346,23 @@ function DashboardPage() {
                     New project
                   </h2>
                   <p className="mt-1 text-xs text-neutral-400">
-                    Naľavo nastavíš základné parametre projektu, napravo spolu s
-                    AI doladíš zadanie, z ktorého potom vytvoríme plán.
+                    Naľavo nastavíš základné parametre projektu a skills tímu,
+                    napravo spolu s AI doladíš zadanie, z ktorého potom
+                    vytvoríme plán, architektúru a tech stack.
                   </p>
                 </div>
               </div>
 
               {/* 2-column layout */}
               <div className="mt-4 grid gap-4 md:grid-cols-[minmax(0,1.05fr)_minmax(0,1.2fr)]">
-                {/* LEFT – base info */}
+                {/* LEFT – base info + skills */}
                 <section className="rounded-2xl border border-neutral-800 bg-black/60 p-4 text-sm">
                   <h3 className="text-sm font-medium text-neutral-100">
-                    Base info
+                    Base info & team skills
                   </h3>
                   <p className="mt-1 text-[11px] text-neutral-500">
-                    Tieto údaje použijeme pri generovaní zadania aj plánu.
+                    Tieto údaje použijeme pri generovaní zadania, plánovania
+                    fáz/úloh aj návrhu architektúry a tech stacku.
                   </p>
 
                   <div className="mt-4 space-y-3">
@@ -409,9 +418,22 @@ function DashboardPage() {
                       />
                     </label>
 
+                    <label className="flex flex-col gap-1">
+                      <span className="text-neutral-200 text-xs">
+                        Team skills (optional)
+                      </span>
+                      <textarea
+                        rows={2}
+                        value={devSkills}
+                        onChange={(e) => setDevSkills(e.target.value)}
+                        className="resize-none rounded-xl border border-neutral-800 bg-black/80 px-3 py-2 text-sm text-neutral-100 outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/40"
+                        placeholder="e.g. TypeScript, React, Node.js, Python"
+                      />
+                    </label>
+
                     <div className="mt-3 rounded-xl border border-dashed border-neutral-800 bg-black/40 px-3 py-2 text-[11px] text-neutral-500">
-                      Tip: napíš pokojne len “todo app pre študentov” – AI ti
-                      pomôže doplniť detailný brief.
+                      Tip: ak zadáš skills, agent sa pokúsi navrhnúť architektúru
+                      a stack tak, aby ich tvoj tím vedel efektívne použiť.
                     </div>
                   </div>
                 </section>
@@ -429,7 +451,7 @@ function DashboardPage() {
                         </h3>
                         <p className="text-[11px] text-neutral-500">
                           Vygeneruj návrh zadania a potom ho uprav tak, aby
-                          sedel tvojmu projektu.
+                          sedel tvojmu projektu a tímu.
                         </p>
                       </div>
                     </div>
@@ -472,8 +494,8 @@ function DashboardPage() {
                 <p className="text-[11px] text-neutral-500">
                   Po kliknutí na{" "}
                   <span className="text-neutral-200">Create project</span>{" "}
-                  použijeme tento brief na vygenerovanie fáz a úloh a uložíme
-                  ich do workspace.
+                  použijeme tento brief a team skills na vygenerovanie fáz,
+                  úloh, návrhu architektúry a odporúčaného tech stacku.
                 </p>
                 <div className="flex justify-end gap-2">
                   <button

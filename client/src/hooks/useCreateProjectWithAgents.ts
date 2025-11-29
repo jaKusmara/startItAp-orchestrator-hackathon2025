@@ -1,5 +1,6 @@
 import { useMutation } from "@tanstack/react-query";
 import axios from "axios";
+import type { ProjectPlan } from "./useOpenAI";
 
 const api = axios.create({
   baseURL: import.meta.env.VITE_API_URL ?? "http://localhost:3000",
@@ -12,6 +13,7 @@ export type CreateProjectPayload = {
   idea?: string;
   teamSize?: string;
   timeframe?: string;
+  devSkills?: string; // NEW – skills tímu, optional
 };
 
 // typy podľa očakávaného response z /projects/create-with-agents
@@ -19,6 +21,7 @@ type TaskDTO = {
   id: number;
   title: string;
   description: string | null;
+  status: string;       
   priority: number;
   createdAt: string;
   phaseId: number;
@@ -42,7 +45,8 @@ export type ProjectDTO = {
 
 type CreateProjectResponse = {
   project: ProjectDTO;
-  // planMeta?: ...  // ak niečo také vrátiš z backendu, môžeš doplniť
+  // metadata z agenta – plán + architektúra + stack
+  planMeta?: ProjectPlan;
 };
 
 export function useCreateProjectWithAgents() {

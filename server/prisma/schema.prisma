@@ -11,6 +11,7 @@ model Project {
   id        Int      @id @default(autoincrement())
   name      String
   idea      String?    
+  devSkills String?
   createdAt DateTime @default(now())
 
   phases    Phase[]

@@ -8,6 +8,7 @@ export type DraftBriefInput = {
   idea: string;
   teamSize?: string;
   timeframe?: string;
+  devSkills?: string; // NEW – skills tímu, optional
 };
 
 export type DraftBriefResponse = {
@@ -30,8 +31,34 @@ export type PlanPhase = {
   tasks: PlanTask[];
 };
 
+// --- architektúra & stack z agenta ---
+
+export type ProjectArchitectureModule = {
+  name: string;
+  responsibility: string;
+  notes?: string;
+};
+
+export type ProjectArchitecture = {
+  overview: string;
+  style: string; // napr. "modular monolith", "microservices"…
+  modules: ProjectArchitectureModule[];
+  dataFlow: string;
+};
+
+export type ProjectTechStack = {
+  rationale: string;
+  backend: string[];
+  frontend: string[];
+  database: string[];
+  infrastructure: string[];
+  testingAndTooling?: string[];
+};
+
 export type ProjectPlan = {
   projectSummary: string;
+  architecture: ProjectArchitecture;
+  techStack: ProjectTechStack;
   phases: PlanPhase[];
 };
 
@@ -40,6 +67,7 @@ export type PlanFromBriefInput = {
   brief: string;
   teamSize?: string;
   timeframe?: string;
+  devSkills?: string; // NEW – skills tímu, optional
 };
 
 export type PlanFromBriefResponse = {
@@ -47,7 +75,6 @@ export type PlanFromBriefResponse = {
 };
 
 // ---- axios client ----
-// môžeš si nastaviť VITE_API_URL vo .env, inak to padne na localhost:3000
 
 const api = axios.create({
   baseURL: import.meta.env.VITE_API_URL ?? "http://localhost:3000",
@@ -90,7 +117,7 @@ export function useOpenAI() {
     isGeneratingBrief: draftBriefMutation.isPending,
     generateBriefError: draftBriefMutation.error,
 
-    // generate plan from final brief
+    // generate plan from final brief (vrátane architecture + techStack, ak to backend vráti)
     generatePlanFromBrief: planFromBriefMutation.mutateAsync,
     isGeneratingPlan: planFromBriefMutation.isPending,
     generatePlanError: planFromBriefMutation.error,
